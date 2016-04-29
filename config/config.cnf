@@ -1,0 +1,13 @@
+mode=dev
+
+[prod]
+redis_host=
+redis_port=
+redis_auth=
+redis_maxidle=
+
+[dev]
+redis_host=104.129.62.20
+redis_port=6379
+redis_auth=
+redis_maxidle=10
