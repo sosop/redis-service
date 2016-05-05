@@ -54,6 +54,7 @@ func do(w http.ResponseWriter, r *http.Request) {
 		outJson(w, models.NewServerRet(err.Error()))
 		return
 	}
+	Logger.Info(db, cmd, args)
 	outJson(w, models.NewSucRet(reply))
 }
 
