@@ -61,10 +61,15 @@ func Exec(db int, commandName string, args ...interface{}) (interface{}, error) 
 		conn.Do("SELECT", db)
 	}
 	reply, err := conn.Do(commandName, args...)
+	if err != nil {
+		return nil, err
+	}
 	var value interface{}
 	switch reply.(type) {
 	case []byte:
 		value = string(reply.([]byte))
+	default:
+		value = reply
 	}
 	return value, err
 }
