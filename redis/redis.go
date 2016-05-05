@@ -53,15 +53,20 @@ func newPool(server, password string, maxIdle int) *redis.Pool {
 	}
 }
 
-func Exec(commandName string, args ...interface{}) (interface{}, error) {
+func Exec(db int, commandName string, args ...interface{}) (interface{}, error) {
 	defer wg.Done()
 	wg.Add(1)
-	reply, err := pool.Get().Do(commandName, args...)
-	return reply, err
-}
-
-func Select(db string) {
-	Exec(db)
+	conn := pool.Get()
+	if db != 0 {
+		conn.Do("SELECT", db)
+	}
+	reply, err := conn.Do(commandName, args...)
+	var value interface{}
+	switch reply.(type) {
+	case []byte:
+		value = string(reply.([]byte))
+	}
+	return value, err
 }
 
 func Close() {
