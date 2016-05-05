@@ -13,3 +13,4 @@ _testmain.go
 _site
 .DS_Store
 logs/*
+config/*
