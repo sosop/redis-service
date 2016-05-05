@@ -7,6 +7,7 @@ import (
 	"redis-service/config"
 	"redis-service/models"
 	"redis-service/redis"
+	. "redis-service/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -24,7 +25,9 @@ func do(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	cmd := r.FormValue("cmd")
 	if strings.TrimSpace(cmd) == "" {
-		outJson(w, models.NewParamRet())
+		ret := models.NewParamRet()
+		Logger.Error(ret)
+		outJson(w, ret)
 		return
 	}
 	db := r.FormValue("db")
@@ -33,6 +36,7 @@ func do(w http.ResponseWriter, r *http.Request) {
 	if strings.TrimSpace(db) != "" {
 		dbInt, err = strconv.Atoi(db)
 		if err != nil {
+			Logger.Error(err)
 			outJson(w, models.NewServerRet(err.Error()))
 			return
 		}
@@ -46,6 +50,7 @@ func do(w http.ResponseWriter, r *http.Request) {
 	}
 	reply, err := redis.Exec(dbInt, cmd, interArgs...)
 	if err != nil {
+		Logger.Error(err)
 		outJson(w, models.NewServerRet(err.Error()))
 		return
 	}
@@ -64,7 +69,7 @@ func NewServer(addr string) *http.Server {
 func outJson(w http.ResponseWriter, ret models.Ret) {
 	data, err := json.Marshal(ret)
 	if err != nil {
-		fmt.Println(err)
+		Logger.Error(err)
 		return
 	}
 	w.Write(data)
